@@ -3,79 +3,179 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Oficinas Endesa Huelva</title>
+    <title>Mapa de Oficinas Endesa - Huelva</title>
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     
     <style>
-        body { margin: 0; padding: 0; font-family: sans-serif; }
-        #map { height: 100vh; width: 100%; }
-        .popup-content { text-align: center; }
-        .btn-maps {
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f7f6;
+            color: #333;
+        }
+        h2 {
+            text-align: center;
+            color: #0056b3;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            max-width: 1100px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        @media (min-width: 768px) {
+            .container {
+                flex-direction: row;
+            }
+        }
+        /* Estilos del Mapa */
+        #map {
+            height: 550px;
+            flex: 2;
+            border-radius: 8px;
+            border: 2px solid #eee;
+            z-index: 1;
+        }
+        /* Estilos de la Lista de Oficinas */
+        .office-list {
+            flex: 1;
+            height: 550px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+        .office-card {
+            background-color: #e9f2fb;
+            border-left: 5px solid #0056b3;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .office-card:hover {
+            background-color: #d0e3f5;
+        }
+        .office-card h4 {
+            margin: 0 0 5px 0;
+            color: #0056b3;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .office-card p {
+            margin: 5px 0;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        .directions-link {
             display: inline-block;
             margin-top: 10px;
-            padding: 8px 12px;
-            background-color: #005495;
-            color: white;
+            font-size: 13px;
+            color: #fff;
+            background-color: #28a745;
+            padding: 6px 12px;
             text-decoration: none;
             border-radius: 4px;
-            font-size: 12px;
+        }
+        .directions-link:hover {
+            background-color: #218838;
+        }
+        /* Estilos del Popup */
+        .leaflet-popup-content h4 {
+            margin: 0 0 5px 0;
+            color: #0056b3;
         }
     </style>
 </head>
 <body>
 
+<h2>Puntos de Atención Endesa en Huelva</h2>
+
+<div class="container">
+    <div class="office-list" id="office-list">
+        </div>
+    
     <div id="map"></div>
+</div>
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+    // Datos actualizados con las oficinas de Huelva
+    const offices = [
+        {
+            name: "Eneho ⚡🚙☀️",
+            lat: 37.26622,
+            lng: -6.94726,
+            address: "Calle Santiago Apóstol, 16, 21002 Huelva",
+            hours: "L‑J 8:00‑14:00 y 15:00‑18:00; V 8:00‑14:15; S-D cerrado"
+        },
+        {
+            name: "Energuia Web Huelva ⚡🚙☀️",
+            lat: 37.25754,
+            lng: -6.94851,
+            address: "Calle Berdigón, Local 24, 21003 Huelva",
+            hours: "L‑V 8:00‑18:00; S-D cerrado"
+        },
+        {
+            name: "Lumielec ⚡🚙☀️",
+            lat: 37.26588,
+            lng: -6.93255,
+            address: "Avenida Federico Molina, 54, 21007 Huelva",
+            hours: "L‑J 8:30‑13:30 y 16:00‑18:00; V 8:30‑13:30; S-D cerrado"
+        }
+    ];
 
-    <script>
-        // Inicializar el mapa centrado en Huelva
-        var map = L.map('map').setView([37.2614, -6.9447], 14);
+    // Inicializar el mapa centrado en Huelva capital
+    const map = L.map('map').setView([37.2614, -6.9447], 14);
 
-        // Añadir capa de mapa (OpenStreetMap)
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; OpenStreetMap contributors'
-        }).addTo(map);
+    // Capa visual del mapa
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
 
-        // Datos de las oficinas
-        var oficinas = [
-            {
-                nombre: "Eneho",
-                direccion: "Calle Santiago Apóstol, 16, 21002 Huelva",
-                horario: "L‑J 8:00‑14:00 y 15:00‑18:00; V 8:00‑14:15",
-                coords: [37.2662, -6.9472]
-            },
-            {
-                nombre: "Energuia Web Huelva",
-                direccion: "Calle Berdigón, Local 24, 21003 Huelva",
-                horario: "L‑V 8:00‑18:00",
-                coords: [37.2575, -6.9485]
-            },
-            {
-                nombre: "Lumielec",
-                direccion: "Avenida Federico Molina, 54, 21007 Huelva",
-                horario: "L‑J 8:30‑13:30 y 16:00‑18:00; V 8:30‑13:30",
-                coords: [37.2658, -6.9325]
-            }
-        ];
+    const listContainer = document.getElementById('office-list');
 
-        // Añadir marcadores al mapa
-        oficinas.forEach(function(oficina) {
-            var googleMapsUrl = "https://www.google.com/maps/dir/?api=1&destination=" + encodeURIComponent(oficina.direccion);
-            
-            var popupHTML = `
-                <div class="popup-content">
-                    <strong>${oficina.nombre}</strong><br>
-                    <small>${oficina.direccion}</small><br>
-                    <p style="font-size:11px; margin:5px 0;">${oficina.horario}</p>
-                    <a href="${googleMapsUrl}" target="_blank" class="btn-maps">Ver en Google Maps</a>
-                </div>
-            `;
+    offices.forEach((office) => {
+        // Enlace a Google Maps usando las coordenadas exactas
+        const mapsLink = `https://www.google.com/maps/dir/?api=1&destination=${office.lat},${office.lng}`;
 
-            L.marker(oficina.coords).addTo(map)
-                .bindPopup(popupHTML);
-        });
-    </script>
+        // 1. Crear marcador en el mapa
+        const marker = L.marker([office.lat, office.lng]).addTo(map);
+        
+        const popupContent = `
+            <h4>${office.name}</h4>
+            <p>📍 ${office.address}</p>
+            <p>⏰ <b>Horario:</b><br>${office.hours}</p>
+            <a href="${mapsLink}" target="_blank" class="directions-link">🗺️ Cómo llegar</a>
+        `;
+        marker.bindPopup(popupContent);
+
+        // 2. Crear tarjeta en la lista lateral
+        const card = document.createElement('div');
+        card.className = 'office-card';
+        card.innerHTML = `
+            <h4>${office.name}</h4>
+            <p>📍 ${office.address}</p>
+            <p>⏰ ${office.hours}</p>
+            <a href="${mapsLink}" target="_blank" class="directions-link" onclick="event.stopPropagation();">🗺️ Abrir en Google Maps</a>
+        `;
+        
+        // Evento para centrar el mapa al hacer clic en la lista
+        card.onclick = () => {
+            map.flyTo([office.lat, office.lng], 17);
+            marker.openPopup();
+        };
+
+        listContainer.appendChild(card);
+    });
+</script>
+
 </body>
 </html>
