@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oficinas Endesa Huelva</title>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <style>
+        body { margin: 0; padding: 0; font-family: sans-serif; }
+        #map { height: 100vh; width: 100%; }
+        .popup-content { text-align: center; }
+        .btn-maps {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 8px 12px;
+            background-color: #005495;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        // Inicializar el mapa centrado en Huelva
+        var map = L.map('map').setView([37.2614, -6.9447], 14);
+
+        // Añadir capa de mapa (OpenStreetMap)
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Datos de las oficinas
+        var oficinas = [
+            {
+                nombre: "Eneho",
+                direccion: "Calle Santiago Apóstol, 16, 21002 Huelva",
+                horario: "L‑J 8:00‑14:00 y 15:00‑18:00; V 8:00‑14:15",
+                coords: [37.2662, -6.9472]
+            },
+            {
+                nombre: "Energuia Web Huelva",
+                direccion: "Calle Berdigón, Local 24, 21003 Huelva",
+                horario: "L‑V 8:00‑18:00",
+                coords: [37.2575, -6.9485]
+            },
+            {
+                nombre: "Lumielec",
+                direccion: "Avenida Federico Molina, 54, 21007 Huelva",
+                horario: "L‑J 8:30‑13:30 y 16:00‑18:00; V 8:30‑13:30",
+                coords: [37.2658, -6.9325]
+            }
+        ];
+
+        // Añadir marcadores al mapa
+        oficinas.forEach(function(oficina) {
+            var googleMapsUrl = "https://www.google.com/maps/dir/?api=1&destination=" + encodeURIComponent(oficina.direccion);
+            
+            var popupHTML = `
+                <div class="popup-content">
+                    <strong>${oficina.nombre}</strong><br>
+                    <small>${oficina.direccion}</small><br>
+                    <p style="font-size:11px; margin:5px 0;">${oficina.horario}</p>
+                    <a href="${googleMapsUrl}" target="_blank" class="btn-maps">Ver en Google Maps</a>
+                </div>
+            `;
+
+            L.marker(oficina.coords).addTo(map)
+                .bindPopup(popupHTML);
+        });
+    </script>
+</body>
+</html>
